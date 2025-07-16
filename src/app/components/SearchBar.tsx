@@ -21,18 +21,15 @@ const CATEGORIES = [
 import AppliedFilters from './AppliedFilters';
 
 interface SearchBarProps {
+  filters: EnhancedSearchFilters;
+  setFilters: (filters: EnhancedSearchFilters) => void;
   onSearch: (filters: SearchFilters | EnhancedSearchFilters) => void;
 }
 
-const SearchBar: React.FC<SearchBarProps> = ({ onSearch }) => {
+const SearchBar: React.FC<SearchBarProps> = ({ filters, setFilters, onSearch }) => {
   const [showFilters, setShowFilters] = useState(false);
   const [showFromDateDropdown, setShowFromDateDropdown] = useState(false);
   const [showToDateDropdown, setShowToDateDropdown] = useState(false);
-  const [keyword, setKeyword] = useState('');
-  const [category, setCategory] = useState('');
-  const [source, setSource] = useState('');
-  const [dateFrom, setDateFrom] = useState('');
-  const [dateTo, setDateTo] = useState('');
 
   const inputRef = useRef<HTMLInputElement>(null);
   const fromDateRef = useRef<HTMLDivElement>(null);
@@ -91,25 +88,21 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch }) => {
 
   const handleDatePresetSelect = (value: string, isFromDate: boolean) => {
     if (isFromDate) {
-      setDateFrom(value);
+      setFilters({ ...filters, dateFrom: value });
       setShowFromDateDropdown(false);
     } else {
-      setDateTo(value);
+      setFilters({ ...filters, dateTo: value });
       setShowToDateDropdown(false);
     }
   };
 
   const handleFormSubmit = () => {
-    onSearch({ keyword, category, source, dateFrom, dateTo });
+    onSearch(filters);
   };
 
   const clearFilters = () => {
-    setKeyword('');
-    setCategory('');
-    setSource('');
-    setDateFrom('');
-    setDateTo('');
-    onSearch({ keyword: '', category: '', source: '', dateFrom: '', dateTo: '' });
+    setFilters({});
+    onSearch({});
   };
 
   return (
@@ -120,16 +113,16 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch }) => {
           <input
             ref={inputRef}
             type="text"
-            value={keyword}
-            onChange={(e) => setKeyword(e.target.value)}
+            value={filters.keyword || ''}
+            onChange={(e) => setFilters({ ...filters, keyword: e.target.value })}
             onKeyDown={handleKeyDown}
             placeholder="Search articles..."
             className="search-input"
           />
-          {keyword && (
+          {filters.keyword && (
             <button
               type="button"
-              onClick={() => setKeyword('')}
+              onClick={() => setFilters({ ...filters, keyword: '' })}
               className="clear-search-btn"
               aria-label="Clear search"
             >
@@ -148,13 +141,9 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch }) => {
           </div>
         </div>
         <AppliedFilters
-          filters={{ keyword, category, source, dateFrom, dateTo }}
+          filters={filters}
           onRemove={(filterKey: string) => {
-            if (filterKey === 'keyword') setKeyword('');
-            if (filterKey === 'category') setCategory('');
-            if (filterKey === 'source') setSource('');
-            if (filterKey === 'dateFrom') setDateFrom('');
-            if (filterKey === 'dateTo') setDateTo('');
+            setFilters({ ...filters, [filterKey]: '' });
             handleFormSubmit();
           }}
           onClearAll={clearFilters}
@@ -172,8 +161,8 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch }) => {
             <div className="filter-group">
               <label>Category</label>
               <select
-                value={category}
-                onChange={(e) => setCategory(e.target.value)}
+                value={filters.category || ''}
+                onChange={(e) => setFilters({ ...filters, category: e.target.value })}
                 className="filter-select"
               >
                 <option value="">All Categories</option>
@@ -187,8 +176,8 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch }) => {
             <div className="filter-group">
               <label>Source</label>
               <select
-                value={source}
-                onChange={(e) => setSource(e.target.value)}
+                value={filters.source || ''}
+                onChange={(e) => setFilters({ ...filters, source: e.target.value })}
                 className="filter-select"
               >
                 <option value="">All Sources</option>
@@ -206,7 +195,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch }) => {
                   <Calendar size={16} className="date-icon" />
                   <input
                     type="text"
-                    value={dateFrom ? formatDateDisplay(dateFrom) : ''}
+                    value={filters.dateFrom ? formatDateDisplay(filters.dateFrom) : ''}
                     onFocus={() => setShowFromDateDropdown(true)}
                     placeholder="Select date..."
                     className="date-input-field filter-input"
@@ -247,7 +236,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch }) => {
                   <Calendar size={16} className="date-icon" />
                   <input
                     type="text"
-                    value={dateTo ? formatDateDisplay(dateTo) : ''}
+                    value={filters.dateTo ? formatDateDisplay(filters.dateTo) : ''}
                     onFocus={() => setShowToDateDropdown(true)}
                     placeholder="Select date..."
                     className="date-input-field filter-input"

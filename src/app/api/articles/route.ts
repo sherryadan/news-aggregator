@@ -29,7 +29,7 @@ export async function GET(req: NextRequest) {
     if (sources.includes('newsapi')) {
       let newsApiUrl = `https://newsapi.org/v2/top-headlines?apiKey=${NEWSAPI_KEY}&pageSize=${PAGE_SIZE}&page=${page}`;
       if (keyword) newsApiUrl += `&q=${encodeURIComponent(keyword)}`;
-      if (category) newsApiUrl += `&category=${category}`;
+      if (category) newsApiUrl += `&category=${category.split(',')[0]}`;
       if (dateFrom) newsApiUrl += `&from=${dateFrom}`;
       if (dateTo) newsApiUrl += `&to=${dateTo}`;
       if (!keyword && !category && !dateFrom && !dateTo) newsApiUrl += `&country=us`;
@@ -57,7 +57,7 @@ export async function GET(req: NextRequest) {
     if (sources.includes('guardian')) {
       let guardianUrl = `https://content.guardianapis.com/search?api-key=${GUARDIAN_KEY}&show-fields=trailText,thumbnail,bodyText,byline&page-size=${PAGE_SIZE}&page=${page}`;
       if (keyword) guardianUrl += `&q=${encodeURIComponent(keyword)}`;
-      if (category) guardianUrl += `&section=${category}`;
+      if (category) guardianUrl += `&section=${category.split(',')[0]}`;
       if (dateFrom) guardianUrl += `&from-date=${dateFrom}`;
       if (dateTo) guardianUrl += `&to-date=${dateTo}`;
       try {

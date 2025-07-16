@@ -117,9 +117,10 @@ const ArticleList: React.FC<ArticleListProps> = ({
   return (
     <div>
       <div className="articles-grid">
-        {articles.map((article) => (
-          <ArticleCard key={article.id} article={article} />
-        ))}
+        {articles.map((article, idx) => {
+          const key = articles.findIndex(a => a.id === article.id) !== idx ? `${article.id}-${idx}` : article.id;
+          return <ArticleCard key={key} article={article} />;
+        })}
         
         {showSkeletons && loading && (
           <>

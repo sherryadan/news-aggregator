@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import './App.css';
 import { Header } from './components/Header';
 import SearchBar from './components/SearchBar';
@@ -25,8 +25,16 @@ const defaultPreferences: UserPreferences = {
 
 function App() {
   const [showPreferences, setShowPreferences] = useState(false);
-  const [filters, setFilters] = useState<EnhancedSearchFilters>({});
   const [preferences, setPreferences] = useState<UserPreferences>(defaultPreferences);
+  const [searchFilters, setSearchFilters] = useState<EnhancedSearchFilters>({});
+
+  // Merge preferences and searchFilters for fetching
+  const mergedFilters = useMemo(() => ({
+    ...(preferences.sources.length ? { source: preferences.sources.join(',') } : {}),
+    ...(preferences.categories.length ? { category: preferences.categories.join(',') } : {}),
+    ...(preferences.authors.length ? { author: preferences.authors.join(',') } : {}),
+    ...searchFilters,
+  }), [preferences, searchFilters]);
 
   // Use TanStack Query for infinite fetching
   const {
@@ -38,8 +46,8 @@ function App() {
     isFetchingNextPage,
     refetch,
   } = useInfiniteQuery<Article[], Error>({
-    queryKey: ['articles', filters],
-    queryFn: ({ pageParam }) => fetchArticles({ pageParam: Number(pageParam) || 1, filters }),
+    queryKey: ['articles', mergedFilters],
+    queryFn: ({ pageParam }) => fetchArticles({ pageParam: Number(pageParam) || 1, filters: mergedFilters }),
     initialPageParam: 1,
     getNextPageParam: (lastPage: Article[], allPages: Article[][]) =>
       lastPage.length === PAGE_SIZE ? allPages.length + 1 : undefined,
@@ -49,18 +57,12 @@ function App() {
   const articles: Article[] = data ? data.pages.flat() : [];
 
   const handleSearch = (newFilters: SearchFilters | EnhancedSearchFilters) => {
-    setFilters({ ...newFilters });
-    refetch();
+    setSearchFilters({ ...searchFilters, ...newFilters });
   };
 
   const handlePreferencesSave = (newPreferences: UserPreferences) => {
     setPreferences(newPreferences);
     setShowPreferences(false);
-    setFilters({
-      source: newPreferences.sources.length ? newPreferences.sources.join(',') : undefined,
-      category: newPreferences.categories.length ? newPreferences.categories.join(',') : undefined,
-      author: newPreferences.authors.length ? newPreferences.authors.join(',') : undefined,
-    });
   };
 
   return (
@@ -68,7 +70,7 @@ function App() {
       <Header onOpenPreferences={() => setShowPreferences(true)} />
       <main className="main-content">
         <div className="search-section">
-          <SearchBar onSearch={handleSearch} />
+          <SearchBar filters={searchFilters} setFilters={setSearchFilters} onSearch={handleSearch} />
         </div>
         <ArticleList
           articles={articles}
