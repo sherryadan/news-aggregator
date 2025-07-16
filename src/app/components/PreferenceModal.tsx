@@ -42,7 +42,7 @@ const PreferencesModal: React.FC<PreferencesModalProps> = ({
     if (isOpen && availableAuthors.length === 0) {
       loadAvailableAuthors();
     }
-  }, [isOpen]);
+  }, [isOpen, availableAuthors.length]);
 
   const loadAvailableAuthors = async () => {
     setLoading(true);
@@ -143,7 +143,7 @@ const PreferencesModal: React.FC<PreferencesModalProps> = ({
           <div className="preferences-section">
             <h3><Tag size={20} /> Categories</h3>
             <p className="preferences-description">
-              Choose the topics you're interested in. Leave empty to see all categories.
+              Choose the topics you are interested in. Leave empty to see all categories.
             </p>
             <div className="checkbox-group">
               {CATEGORIES.map(category => (

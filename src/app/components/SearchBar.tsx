@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Search, Filter, Calendar, X, Save, History, ChevronDown } from 'lucide-react';
+import { Search, Filter, Calendar, X, ChevronDown } from 'lucide-react';
 import { SearchFilters, EnhancedSearchFilters } from '../types';
 
 const SOURCES = [

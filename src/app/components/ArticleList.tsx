@@ -85,7 +85,7 @@ const ArticleList: React.FC<ArticleListProps> = ({
           </div>
           <h3 className="empty-state-title">No articles found</h3>
           <p className="empty-state-description">
-            We couldn't find any articles matching your criteria. Try adjusting your search or preferences.
+            We could not find any articles matching your criteria. Try adjusting your search or preferences.
           </p>
           
           <div className="empty-state-suggestions">

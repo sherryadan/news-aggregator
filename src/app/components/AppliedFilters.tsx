@@ -8,14 +8,6 @@ interface AppliedFiltersProps {
   onClearAll: () => void;
 }
 
-const DEFAULT_FILTERS: EnhancedSearchFilters = {
-  keyword: undefined,
-  category: undefined,
-  source: undefined,
-  dateFrom: undefined,
-  dateTo: undefined
-};
-
 const AppliedFilters: React.FC<AppliedFiltersProps> = ({ filters, onRemove, onClearAll }) => {
   const activeFilters = Object.entries(filters).filter(([key, value]) => {
     return value !== undefined && value !== '' && value !== null;
