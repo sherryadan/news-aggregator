@@ -185,6 +185,5 @@ export interface Article {
     createdAt: string;
   }
   
-  export interface EnhancedSearchFilters extends SearchFilters {
-    // All properties are optional, inheriting from SearchFilters
-  } 
+  // EnhancedSearchFilters is kept for type compatibility, but must not be empty for linting
+  export type EnhancedSearchFilters = SearchFilters; 

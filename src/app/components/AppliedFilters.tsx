@@ -4,7 +4,7 @@ import { EnhancedSearchFilters } from '../types';
 
 interface AppliedFiltersProps {
   filters: EnhancedSearchFilters;
-  onRemove: (filterType: keyof EnhancedSearchFilters, value?: any) => void;
+  onRemove: (filterType: keyof EnhancedSearchFilters, value?: unknown) => void;
   onClearAll: () => void;
 }
 
@@ -15,20 +15,20 @@ const AppliedFilters: React.FC<AppliedFiltersProps> = ({ filters, onRemove, onCl
 
   if (activeFilters.length === 0) return null;
 
-  const getFilterLabel = (key: string, value: any): string => {
+  const getFilterLabel = (key: string, value: unknown): string => {
     switch (key) {
       case 'keyword':
-        return `Search: "${value}"`;
+        return `Search: "${value as string}"`;
       case 'category':
-        return `Category: ${value}`;
+        return `Category: ${value as string}`;
       case 'source':
-        return `Source: ${value}`;
+        return `Source: ${value as string}`;
       case 'dateFrom':
-        return `From: ${new Date(value).toLocaleDateString()}`;
+        return `From: ${new Date(value as string).toLocaleDateString()}`;
       case 'dateTo':
-        return `To: ${new Date(value).toLocaleDateString()}`;
+        return `To: ${new Date(value as string).toLocaleDateString()}`;
       default:
-        return `${key}: ${value}`;
+        return `${key}: ${String(value)}`;
     }
   };
 
@@ -53,7 +53,7 @@ const AppliedFilters: React.FC<AppliedFiltersProps> = ({ filters, onRemove, onCl
             <div key={key} className="filter-chip">
               <span className="filter-chip-label">{label}</span>
               <button
-                onClick={() => onRemove(key as keyof EnhancedSearchFilters)}
+                onClick={() => onRemove(key as keyof EnhancedSearchFilters, value)}
                 className="filter-chip-remove"
                 aria-label={`Remove ${label} filter`}
               >
