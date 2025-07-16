@@ -21,7 +21,6 @@ export async function GET(req: NextRequest) {
   const authors = authorParam ? authorParam.split(',').map(a => a.trim()).filter(Boolean) : [];
 
   try {
-    let allArticles: Article[] = [];
     let newsApiArticles: Article[] = [];
     let guardianArticles: Article[] = [];
     let nyTimesArticles: Article[] = [];
@@ -37,16 +36,16 @@ export async function GET(req: NextRequest) {
       try {
         const newsApiRes = await fetch(newsApiUrl);
         const newsApiData = await newsApiRes.json();
-        newsApiArticles = (newsApiData.articles || []).map((a: any, i: number): Article => ({
-          id: a.url || i,
-          title: a.title,
-          description: a.description,
-          content: a.content,
-          url: a.url,
-          urlToImage: a.urlToImage,
-          publishedAt: a.publishedAt,
-          source: { id: a.source?.id || 'newsapi', name: a.source?.name || 'NewsAPI' },
-          author: a.author,
+        newsApiArticles = (newsApiData.articles || []).map((a: Record<string, unknown>): Article => ({
+          id: (a.url as string) || '',
+          title: (a.title as string) || '',
+          description: (a.description as string) || '',
+          content: (a.content as string) || '',
+          url: (a.url as string) || '',
+          urlToImage: (a.urlToImage as string) || '',
+          publishedAt: (a.publishedAt as string) || '',
+          source: { id: (a.source as { id?: string })?.id || 'newsapi', name: (a.source as { name?: string })?.name || 'NewsAPI' },
+          author: (a.author as string) || '',
           category: category || 'general',
         }));
       } catch (err) {
@@ -64,16 +63,16 @@ export async function GET(req: NextRequest) {
       try {
         const guardianRes = await fetch(guardianUrl);
         const guardianData = await guardianRes.json();
-        guardianArticles = (guardianData.response?.results || []).map((a: any, i: number): Article => ({
-          id: a.id,
-          title: a.webTitle,
-          description: a.fields?.trailText,
-          content: a.fields?.bodyText,
-          url: a.webUrl,
-          urlToImage: a.fields?.thumbnail,
-          publishedAt: a.webPublicationDate,
+        guardianArticles = (guardianData.response?.results || []).map((a: Record<string, unknown>): Article => ({
+          id: (a.id as string) || '',
+          title: (a.webTitle as string) || '',
+          description: (a.fields as { trailText?: string })?.trailText || '',
+          content: (a.fields as { bodyText?: string })?.bodyText || '',
+          url: (a.webUrl as string) || '',
+          urlToImage: (a.fields as { thumbnail?: string })?.thumbnail || '',
+          publishedAt: (a.webPublicationDate as string) || '',
           source: { id: 'guardian', name: 'The Guardian' },
-          author: a.fields?.byline,
+          author: (a.fields as { byline?: string })?.byline || '',
           category: category || 'general',
         }));
       } catch (err) {
@@ -90,16 +89,16 @@ export async function GET(req: NextRequest) {
       try {
         const nyTimesRes = await fetch(nyTimesUrl);
         const nyTimesData = await nyTimesRes.json();
-        nyTimesArticles = (nyTimesData.response?.docs || []).map((a: any, i: number): Article => ({
-          id: a._id,
-          title: a.headline?.main,
-          description: a.snippet,
-          content: a.lead_paragraph,
-          url: a.web_url,
-          urlToImage: a.multimedia?.length ? `https://www.nytimes.com/${a.multimedia[0].url}` : '',
-          publishedAt: a.pub_date,
+        nyTimesArticles = (nyTimesData.response?.docs || []).map((a: Record<string, unknown>): Article => ({
+          id: (a._id as string) || '',
+          title: (a.headline as { main?: string })?.main || '',
+          description: (a.snippet as string) || '',
+          content: (a.lead_paragraph as string) || '',
+          url: (a.web_url as string) || '',
+          urlToImage: Array.isArray(a.multimedia) && (a.multimedia as Array<{ url: string }>).length ? `https://www.nytimes.com/${(a.multimedia as Array<{ url: string }>)[0].url}` : '',
+          publishedAt: (a.pub_date as string) || '',
           source: { id: 'nytimes', name: 'NYTimes' },
-          author: a.byline?.original,
+          author: (a.byline as { original?: string })?.original || '',
           category: category || 'general',
         }));
       } catch (err) {
@@ -125,4 +124,4 @@ export async function GET(req: NextRequest) {
     console.error('API Route Error:', error);
     return NextResponse.json({ error: (error as Error).message }, { status: 500 });
   }
-} 
+}
