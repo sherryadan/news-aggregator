@@ -57,7 +57,7 @@ function App() {
   const articles: Article[] = data ? data.pages.flat() : [];
 
   const handleSearch = (newFilters: SearchFilters | EnhancedSearchFilters) => {
-    setSearchFilters({ ...searchFilters, ...newFilters });
+    setSearchFilters(newFilters);
   };
 
   const handlePreferencesSave = (newPreferences: UserPreferences) => {
